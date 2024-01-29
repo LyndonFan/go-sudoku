@@ -13,4 +13,11 @@ func main() {
 		{0, 0, 0, 0, 0, 0, 0, 0, 0},
 	}
 	s.Print()
+
+	ps := s.ToPossibleSudoku()
+	xs := ps.Get(8, 0)
+	for i := 0; i <= 6; i++ {
+		xs[i] = false
+	}
+	ps.PrintWithSymbols()
 }
