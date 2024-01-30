@@ -4,12 +4,12 @@ import "fmt"
 
 type Rule interface {
 	Global() bool
-	Check(PossibleSudoku, int, int) bool
-	Apply(PossibleSudoku, int, int) (bool, [][2]int)
+	Check(*PossibleSudoku, int, int) bool
+	Apply(*PossibleSudoku, int, int) (bool, [][2]int)
 }
 
 type Solver struct {
-	possibilities []PossibleSudoku
+	possibilities []*PossibleSudoku
 	GlobalRules   []Rule
 	LocalRules    []Rule
 }
@@ -25,36 +25,45 @@ func NewSolver(rules []Rule) *Solver {
 		}
 	}
 	return &Solver{
-		possibilities: make([]PossibleSudoku, 0, N*N),
+		possibilities: make([]*PossibleSudoku, 0, N*N),
 		GlobalRules:   globalRules,
 		LocalRules:    localRules,
 	}
 }
 
-func (solver *Solver) Solve(puzzle Sudoku) []Sudoku {
+func (solver *Solver) Solve(puzzle Sudoku) []*Sudoku {
 	ps := puzzle.ToPossibleSudoku()
 	solver.possibilities = append(solver.possibilities, ps)
 	var solved [N * N]bool
-	positionQueue := make([]int, 0, N*N)
+	var checkPosition [N * N]bool
 	for row := 0; row < N; row++ {
 		for col := 0; col < N; col++ {
 			if puzzle[row][col] > 0 {
 				solved[row*N+col] = true
-				positionQueue = append(positionQueue, row*N+col)
+				checkPosition[row*N+col] = true
 			}
 		}
 	}
-	changed := len(positionQueue) > 0
-	solutions := make([]Sudoku, 0, N*N)
+	var changed bool
+	for _, b := range checkPosition {
+		if b {
+			changed = true
+			break
+		}
+	}
+	solutions := make([]*Sudoku, 0, N*N)
 	for changed {
 		changed = false
-		var addPosition [N * N]bool
-		for _, pos := range positionQueue {
+		var newCheckPosition [N * N]bool
+		for pos, b := range checkPosition {
+			if !b {
+				continue
+			}
 			row, col := pos/N, pos%N
 			for _, rule := range solver.GlobalRules {
 				satisfyRule := rule.Check(ps, row, col)
 				if !satisfyRule {
-					return []Sudoku{}
+					return []*Sudoku{}
 				}
 				applied, changedPositions := rule.Apply(ps, row, col)
 				if !applied {
@@ -62,17 +71,13 @@ func (solver *Solver) Solve(puzzle Sudoku) []Sudoku {
 				}
 				changed = true
 				for _, cPos := range changedPositions {
-					addPosition[cPos[0]*N+cPos[1]] = true
+					newCheckPosition[cPos[0]*N+cPos[1]] = true
 				}
 			}
 		}
-		positionQueue = positionQueue[:0]
-		for i, b := range addPosition {
-			if b {
-				positionQueue = append(positionQueue, i)
-			}
-		}
+		checkPosition = newCheckPosition
 	}
+	ps.PrintWithSymbols()
 	if ps.AllSolved() {
 		solutions = append(solutions, ps.ToSudoku())
 	} else {
