@@ -5,19 +5,25 @@ func main() {
 		{1, 2, 3, 4, 5, 6, 7, 8, 9},
 		{4, 5, 6, 7, 8, 9, 1, 2, 3},
 		{7, 8, 9, 1, 2, 3, 4, 5, 6},
-		{2, 1, 4, 3, 6, 5, 8, 9, 7},
-		{3, 6, 5, 8, 9, 7, 2, 1, 4},
-		{8, 9, 7, 2, 1, 4, 3, 6, 5},
-		{5, 3, 2, 6, 4, 1, 9, 7, 8},
-		{6, 4, 1, 9, 7, 8, 5, 3, 2},
+		{2, 3, 1, 5, 6, 4, 8, 9, 7},
+		{5, 6, 4, 8, 9, 7, 2, 3, 1},
+		{8, 9, 7, 2, 3, 1, 5, 6, 4},
+		{3, 1, 2, 6, 4, 5, 9, 7, 8},
+		{6, 4, 5, 9, 7, 8, 3, 1, 2},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0},
 	}
 	s.Print()
 
 	ps := s.ToPossibleSudoku()
-	xs := ps.Get(8, 0)
-	for i := 0; i <= 6; i++ {
-		xs[i] = false
-	}
 	ps.PrintWithSymbols()
+
+	solver := NewSolver([]Rule{
+		VerticalRule{},
+		HorizontalRule{},
+		SquareRule{},
+	})
+	solutions := solver.Solve(s)
+	for _, solution := range solutions {
+		solution.Print()
+	}
 }
