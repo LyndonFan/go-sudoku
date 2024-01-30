@@ -35,6 +35,24 @@ func (ps *PossibleSudoku) Get(row, col int) *[N]bool {
 	return &(ps[row*N+col])
 }
 
+func (ps *PossibleSudoku) Set(row, col, val int) {
+	for i := 0; i < N; i++ {
+		ps[row*N+col][i] = false
+	}
+	ps[row*N+col][val-1] = true
+}
+
+func (ps *PossibleSudoku) Possible(row, col int) bool {
+	var ct int
+	xs := ps.Get(row, col)
+	for _, b := range xs {
+		if b {
+			ct++
+		}
+	}
+	return ct > 0
+}
+
 func (ps *PossibleSudoku) Solved(row, col int) (bool, int) {
 	val, ct := -1, 0
 	xs := ps.Get(row, col)
@@ -48,6 +66,29 @@ func (ps *PossibleSudoku) Solved(row, col int) (bool, int) {
 		return true, val
 	}
 	return false, 0
+}
+
+func (ps *PossibleSudoku) AllPossible() bool {
+	for i := 0; i < N; i++ {
+		for j := 0; j < N; j++ {
+			if !ps.Possible(i, j) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (ps *PossibleSudoku) AllSolved() bool {
+	for i := 0; i < N; i++ {
+		for j := 0; j < N; j++ {
+			solved, _ := ps.Solved(i, j)
+			if !solved {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // Use trigram symbols (☰☱☲☳☴☵☶☷, 0x2630 - 0x2637)
