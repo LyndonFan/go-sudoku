@@ -1,6 +1,6 @@
 package main
 
-func checkNoRepeat(ps PossibleSudoku, neighbourhood [][2]int) bool {
+func checkNoRepeat(ps *PossibleSudoku, neighbourhood [][2]int) bool {
 	var seen [N]bool
 	var possible [N]bool
 	for _, pos := range neighbourhood {
@@ -29,7 +29,7 @@ func checkNoRepeat(ps PossibleSudoku, neighbourhood [][2]int) bool {
 }
 
 func applyNoRepeat(
-	ps PossibleSudoku,
+	ps *PossibleSudoku,
 	neighbourhood [][2]int,
 	row, col int,
 ) (bool, [][2]int) {
@@ -44,10 +44,9 @@ func applyNoRepeat(
 		if pos[0] == row && pos[1] == col {
 			continue
 		}
-		xs := ps.Get(pos[0], pos[1])
-		if xs[val] {
+		if ps.Get(pos[0], pos[1])[val] {
 			res = append(res, pos)
-			xs[val] = false
+			ps.SetPossible(pos[0], pos[1], val, false)
 		}
 	}
 	return true, res
@@ -67,11 +66,11 @@ func (rule HorizontalRule) Global() bool {
 	return true
 }
 
-func (rule HorizontalRule) Check(ps PossibleSudoku, row, col int) bool {
+func (rule HorizontalRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
 
-func (rule HorizontalRule) Apply(ps PossibleSudoku, row, col int) (bool, [][2]int) {
+func (rule HorizontalRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
 	return applyNoRepeat(ps, rule.neighbourhood(row, col), row, col)
 }
 
@@ -89,11 +88,11 @@ func (rule VerticalRule) Global() bool {
 	return true
 }
 
-func (rule VerticalRule) Check(ps PossibleSudoku, row, col int) bool {
+func (rule VerticalRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
 
-func (rule VerticalRule) Apply(ps PossibleSudoku, row, col int) (bool, [][2]int) {
+func (rule VerticalRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
 	return applyNoRepeat(ps, rule.neighbourhood(row, col), row, col)
 }
 
@@ -114,10 +113,10 @@ func (rule SquareRule) neighbourhood(row, col int) [][2]int {
 	return res
 }
 
-func (rule SquareRule) Check(ps PossibleSudoku, row, col int) bool {
+func (rule SquareRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
 
-func (rule SquareRule) Apply(ps PossibleSudoku, row, col int) (bool, [][2]int) {
+func (rule SquareRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
 	return applyNoRepeat(ps, rule.neighbourhood(row, col), row, col)
 }

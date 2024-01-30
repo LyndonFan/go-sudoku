@@ -35,7 +35,11 @@ func (ps *PossibleSudoku) Get(row, col int) *[N]bool {
 	return &(ps[row*N+col])
 }
 
-func (ps *PossibleSudoku) Set(row, col, val int) {
+func (ps *PossibleSudoku) SetPossible(row, col, val int, possible bool) {
+	ps[row*N+col][val] = possible
+}
+
+func (ps *PossibleSudoku) SetValue(row, col, val int) {
 	for i := 0; i < N; i++ {
 		ps[row*N+col][i] = false
 	}
@@ -59,7 +63,7 @@ func (ps *PossibleSudoku) Solved(row, col int) (bool, int) {
 	for k, b := range xs {
 		if b {
 			ct++
-			val = k + 1
+			val = k
 		}
 	}
 	if ct == 1 {
@@ -113,7 +117,7 @@ func (ps *PossibleSudoku) PrintWithSymbols() {
 			}
 			solved, val := ps.Solved(i, j)
 			if solved {
-				fmt.Printf(" %d ", val)
+				fmt.Printf(" %d ", val+1)
 				continue
 			}
 			xs := ps.Get(i, j)
@@ -132,7 +136,7 @@ func (ps *PossibleSudoku) PrintWithSymbols() {
 	fmt.Println(horizontal)
 }
 
-func (s Sudoku) ToPossibleSudoku() PossibleSudoku {
+func (s Sudoku) ToPossibleSudoku() *PossibleSudoku {
 	ps := PossibleSudoku{}
 	for i := 0; i < N; i++ {
 		for j := 0; j < N; j++ {
@@ -146,10 +150,10 @@ func (s Sudoku) ToPossibleSudoku() PossibleSudoku {
 			}
 		}
 	}
-	return ps
+	return &ps
 }
 
-func (ps PossibleSudoku) ToSudoku() Sudoku {
+func (ps *PossibleSudoku) ToSudoku() *Sudoku {
 	s := Sudoku{}
 	for i := 0; i < N; i++ {
 		for j := 0; j < N; j++ {
@@ -166,5 +170,5 @@ func (ps PossibleSudoku) ToSudoku() Sudoku {
 			}
 		}
 	}
-	return s
+	return &s
 }
