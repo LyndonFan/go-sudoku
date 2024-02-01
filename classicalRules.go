@@ -52,6 +52,49 @@ func applyNoRepeat(
 	return true, res
 }
 
+func applyOneToNine(
+	ps *PossibleSudoku,
+	neighbourhood [][2]int,
+	row, col int,
+) (bool, [][2]int) {
+	solved, _ := ps.Solved(row, col)
+	if solved {
+		return applyNoRepeat(ps, neighbourhood, row, col)
+	}
+	neighbourIndex := -1
+	for i, pos := range neighbourhood {
+		if pos[0] == row && pos[1] == col {
+			neighbourIndex = i
+			break
+		}
+	}
+	if neighbourIndex == -1 {
+		return false, nil
+	}
+	possibleIndexes := make([][]int, N)
+	for i := 0; i < N; i++ {
+		possibleIndexes[i] = make([]int, 0, N)
+	}
+	for idx, pos := range neighbourhood {
+		xs := ps.Get(pos[0], pos[1])
+		for i, b := range xs {
+			if b {
+				possibleIndexes[i] = append(possibleIndexes[i], idx)
+			}
+		}
+	}
+	for v, idxs := range possibleIndexes {
+		if !(len(idxs) == 1 && idxs[0] == neighbourIndex) {
+			continue
+		}
+		for x := 0; x < N; x++ {
+			ps.SetPossible(row, col, x, x == v)
+		}
+		return applyNoRepeat(ps, neighbourhood, row, col)
+	}
+	return false, nil
+}
+
 type HorizontalRule struct{}
 
 func (rule HorizontalRule) neighbourhood(row, _ int) [][2]int {
@@ -71,7 +114,7 @@ func (rule HorizontalRule) Check(ps *PossibleSudoku, row, col int) bool {
 }
 
 func (rule HorizontalRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
-	return applyNoRepeat(ps, rule.neighbourhood(row, col), row, col)
+	return applyOneToNine(ps, rule.neighbourhood(row, col), row, col)
 }
 
 type VerticalRule struct{}
@@ -93,7 +136,7 @@ func (rule VerticalRule) Check(ps *PossibleSudoku, row, col int) bool {
 }
 
 func (rule VerticalRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
-	return applyNoRepeat(ps, rule.neighbourhood(row, col), row, col)
+	return applyOneToNine(ps, rule.neighbourhood(row, col), row, col)
 }
 
 type SquareRule struct{}
@@ -118,5 +161,5 @@ func (rule SquareRule) Check(ps *PossibleSudoku, row, col int) bool {
 }
 
 func (rule SquareRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
-	return applyNoRepeat(ps, rule.neighbourhood(row, col), row, col)
+	return applyOneToNine(ps, rule.neighbourhood(row, col), row, col)
 }

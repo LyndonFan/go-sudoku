@@ -2,12 +2,6 @@ package main
 
 import "fmt"
 
-type Rule interface {
-	Global() bool
-	Check(*PossibleSudoku, int, int) bool
-	Apply(*PossibleSudoku, int, int) (bool, [][2]int)
-}
-
 type Solver struct {
 	possibilities []*PossibleSudoku
 	GlobalRules   []Rule
