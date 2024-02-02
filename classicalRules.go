@@ -105,10 +105,6 @@ func (rule HorizontalRule) neighbourhood(row, _ int) [][2]int {
 	return res
 }
 
-func (rule HorizontalRule) Global() bool {
-	return true
-}
-
 func (rule HorizontalRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
@@ -127,10 +123,6 @@ func (rule VerticalRule) neighbourhood(_, col int) [][2]int {
 	return res
 }
 
-func (rule VerticalRule) Global() bool {
-	return true
-}
-
 func (rule VerticalRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
@@ -140,10 +132,6 @@ func (rule VerticalRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int
 }
 
 type SquareRule struct{}
-
-func (rule SquareRule) Global() bool {
-	return true
-}
 
 func (rule SquareRule) neighbourhood(row, col int) [][2]int {
 	squareRow, squareCol := row/3, col/3

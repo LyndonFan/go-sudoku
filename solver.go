@@ -4,24 +4,13 @@ import "fmt"
 
 type Solver struct {
 	possibilities []*PossibleSudoku
-	GlobalRules   []Rule
-	LocalRules    []Rule
+	Rules         []Rule
 }
 
 func NewSolver(rules []Rule) *Solver {
-	globalRules := make([]Rule, 0, len(rules))
-	localRules := make([]Rule, 0, len(rules))
-	for _, rule := range rules {
-		if rule.Global() {
-			globalRules = append(globalRules, rule)
-		} else {
-			localRules = append(localRules, rule)
-		}
-	}
 	return &Solver{
 		possibilities: make([]*PossibleSudoku, 0, N*N),
-		GlobalRules:   globalRules,
-		LocalRules:    localRules,
+		Rules:         rules,
 	}
 }
 
@@ -54,7 +43,7 @@ func (solver *Solver) Solve(puzzle Sudoku) []*Sudoku {
 				continue
 			}
 			row, col := pos/N, pos%N
-			for _, rule := range solver.GlobalRules {
+			for _, rule := range solver.Rules {
 				satisfyRule := rule.Check(ps, row, col)
 				if !satisfyRule {
 					return []*Sudoku{}
