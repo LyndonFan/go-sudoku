@@ -5,18 +5,16 @@ import (
 	"strings"
 )
 
-const N = 9
-
-type Sudoku [N][N]int
-type PossibleSudoku [N * N][N]bool
+type Sudoku [9][9]int
+type PossibleSudoku [9 * 9][9]bool
 
 func (s Sudoku) Print() {
 	horizontal := "┼---┼---┼---┼"
-	for i := 0; i < N; i++ {
+	for i := 0; i < 9; i++ {
 		if i%3 == 0 {
 			fmt.Println(horizontal)
 		}
-		for j := 0; j < N; j++ {
+		for j := 0; j < 9; j++ {
 			if j%3 == 0 {
 				fmt.Print("|")
 			}
@@ -31,19 +29,19 @@ func (s Sudoku) Print() {
 	fmt.Println(horizontal)
 }
 
-func (ps *PossibleSudoku) Get(row, col int) *[N]bool {
-	return &(ps[row*N+col])
+func (ps *PossibleSudoku) Get(row, col int) *[9]bool {
+	return &(ps[row*9+col])
 }
 
 func (ps *PossibleSudoku) SetPossible(row, col, val int, possible bool) {
-	ps[row*N+col][val] = possible
+	ps[row*9+col][val] = possible
 }
 
 func (ps *PossibleSudoku) SetValue(row, col, val int) {
-	for i := 0; i < N; i++ {
-		ps[row*N+col][i] = false
+	for i := 0; i < 9; i++ {
+		ps[row*9+col][i] = false
 	}
-	ps[row*N+col][val-1] = true
+	ps[row*9+col][val-1] = true
 }
 
 func (ps *PossibleSudoku) Possible(row, col int) bool {
@@ -73,8 +71,8 @@ func (ps *PossibleSudoku) Solved(row, col int) (bool, int) {
 }
 
 func (ps *PossibleSudoku) AllPossible() bool {
-	for i := 0; i < N; i++ {
-		for j := 0; j < N; j++ {
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 9; j++ {
 			if !ps.Possible(i, j) {
 				return false
 			}
@@ -84,8 +82,8 @@ func (ps *PossibleSudoku) AllPossible() bool {
 }
 
 func (ps *PossibleSudoku) AllSolved() bool {
-	for i := 0; i < N; i++ {
-		for j := 0; j < N; j++ {
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 9; j++ {
 			solved, _ := ps.Solved(i, j)
 			if !solved {
 				return false
@@ -105,11 +103,11 @@ func (ps *PossibleSudoku) AllSolved() bool {
 func (ps *PossibleSudoku) PrintWithSymbols() {
 	symbols := [8]string{"☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"}
 	horizontal := strings.Repeat("┼"+strings.Repeat("-", 11), 3) + "┼"
-	for i := 0; i < N; i++ {
+	for i := 0; i < 9; i++ {
 		if i%3 == 0 {
 			fmt.Println(horizontal)
 		}
-		for j := 0; j < N; j++ {
+		for j := 0; j < 9; j++ {
 			if j%3 == 0 {
 				fmt.Print("|")
 			} else {
@@ -138,14 +136,14 @@ func (ps *PossibleSudoku) PrintWithSymbols() {
 
 func (s Sudoku) ToPossibleSudoku() *PossibleSudoku {
 	ps := PossibleSudoku{}
-	for i := 0; i < N; i++ {
-		for j := 0; j < N; j++ {
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 9; j++ {
 			v := s[i][j]
 			if v > 0 {
-				ps[i*N+j][v-1] = true
+				ps[i*9+j][v-1] = true
 			} else {
-				for k := 0; k < N; k++ {
-					ps[i*N+j][k] = true
+				for k := 0; k < 9; k++ {
+					ps[i*9+j][k] = true
 				}
 			}
 		}
@@ -155,12 +153,12 @@ func (s Sudoku) ToPossibleSudoku() *PossibleSudoku {
 
 func (ps *PossibleSudoku) ToSudoku() *Sudoku {
 	s := Sudoku{}
-	for i := 0; i < N; i++ {
-		for j := 0; j < N; j++ {
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 9; j++ {
 			val := -1
 			ct := 0
-			for k := 0; k < N; k++ {
-				if ps[i*N+j][k] {
+			for k := 0; k < 9; k++ {
+				if ps[i*9+j][k] {
 					ct++
 					val = k + 1
 				}

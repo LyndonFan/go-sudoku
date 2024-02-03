@@ -1,8 +1,8 @@
 package main
 
 func checkNoRepeat(ps *PossibleSudoku, neighbourhood [][2]int) bool {
-	var seen [N]bool
-	var possible [N]bool
+	var seen [9]bool
+	var possible [9]bool
 	for _, pos := range neighbourhood {
 		solved, val := ps.Solved(pos[0], pos[1])
 		if solved {
@@ -39,7 +39,7 @@ func applyNoRepeat(
 	if !solved {
 		return false, nil
 	}
-	res := make([][2]int, 0, N) // usually N, but can be smaller or larger
+	res := make([][2]int, 0, 9) // usually N, but can be smaller or larger
 	for _, pos := range neighbourhood {
 		if pos[0] == row && pos[1] == col {
 			continue
@@ -71,9 +71,9 @@ func applyOneToNine(
 	if neighbourIndex == -1 {
 		return false, nil
 	}
-	possibleIndexes := make([][]int, N)
-	for i := 0; i < N; i++ {
-		possibleIndexes[i] = make([]int, 0, N)
+	possibleIndexes := make([][]int, 9)
+	for i := 0; i < 9; i++ {
+		possibleIndexes[i] = make([]int, 0, 9)
 	}
 	for idx, pos := range neighbourhood {
 		xs := ps.Get(pos[0], pos[1])
@@ -87,7 +87,7 @@ func applyOneToNine(
 		if !(len(idxs) == 1 && idxs[0] == neighbourIndex) {
 			continue
 		}
-		for x := 0; x < N; x++ {
+		for x := 0; x < 9; x++ {
 			ps.SetPossible(row, col, x, x == v)
 		}
 		return applyNoRepeat(ps, neighbourhood, row, col)

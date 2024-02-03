@@ -9,7 +9,7 @@ type Solver struct {
 
 func NewSolver(rules []Rule) *Solver {
 	return &Solver{
-		possibilities: make([]*PossibleSudoku, 0, N*N),
+		possibilities: make([]*PossibleSudoku, 0, 9*9),
 		Rules:         rules,
 	}
 }
@@ -17,13 +17,13 @@ func NewSolver(rules []Rule) *Solver {
 func (solver *Solver) Solve(puzzle Sudoku) []*Sudoku {
 	ps := puzzle.ToPossibleSudoku()
 	solver.possibilities = append(solver.possibilities, ps)
-	var solved [N * N]bool
-	var checkPosition [N * N]bool
-	for row := 0; row < N; row++ {
-		for col := 0; col < N; col++ {
+	var solved [9 * 9]bool
+	var checkPosition [9 * 9]bool
+	for row := 0; row < 9; row++ {
+		for col := 0; col < 9; col++ {
 			if puzzle[row][col] > 0 {
-				solved[row*N+col] = true
-				checkPosition[row*N+col] = true
+				solved[row*9+col] = true
+				checkPosition[row*9+col] = true
 			}
 		}
 	}
@@ -34,15 +34,15 @@ func (solver *Solver) Solve(puzzle Sudoku) []*Sudoku {
 			break
 		}
 	}
-	solutions := make([]*Sudoku, 0, N*N)
+	solutions := make([]*Sudoku, 0, 9*9)
 	for changed {
 		changed = false
-		var newCheckPosition [N * N]bool
+		var newCheckPosition [9 * 9]bool
 		for pos, b := range checkPosition {
 			if !b {
 				continue
 			}
-			row, col := pos/N, pos%N
+			row, col := pos/9, pos%9
 			for _, rule := range solver.Rules {
 				satisfyRule := rule.Check(ps, row, col)
 				if !satisfyRule {
@@ -54,7 +54,7 @@ func (solver *Solver) Solve(puzzle Sudoku) []*Sudoku {
 				}
 				changed = true
 				for _, cPos := range changedPositions {
-					newCheckPosition[cPos[0]*N+cPos[1]] = true
+					newCheckPosition[cPos[0]*9+cPos[1]] = true
 				}
 			}
 		}
