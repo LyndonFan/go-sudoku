@@ -44,10 +44,10 @@ func (solver *Solver) Solve(puzzle Sudoku) []*Sudoku {
 			}
 			row, col := pos/9, pos%9
 			for _, rule := range solver.Rules {
-				satisfyRule := rule.Check(ps, row, col)
-				if !satisfyRule {
-					return []*Sudoku{}
-				}
+				// satisfyRule := rule.Check(ps, row, col)
+				// if !satisfyRule {
+				// 	return []*Sudoku{}
+				// }
 				changedPositions := rule.Apply(ps, row, col)
 				for _, cPos := range changedPositions {
 					newCheckPosition[cPos[0]*9+cPos[1]] = true
