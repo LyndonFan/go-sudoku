@@ -32,12 +32,12 @@ func applyNoRepeat(
 	ps *PossibleSudoku,
 	neighbourhood [][2]int,
 	row, col int,
-) (bool, [][2]int) {
+) [][2]int {
 	// below is naive approach, only does work if the cell is solved
 	// TODO: do some complex rules? Or decide to leave it to another rule
 	solved, val := ps.Solved(row, col)
 	if !solved {
-		return false, nil
+		return nil
 	}
 	res := make([][2]int, 0, 9) // usually N, but can be smaller or larger
 	for _, pos := range neighbourhood {
@@ -49,14 +49,14 @@ func applyNoRepeat(
 			ps.SetPossible(pos[0], pos[1], val, false)
 		}
 	}
-	return true, res
+	return res
 }
 
 func applyOneToNine(
 	ps *PossibleSudoku,
 	neighbourhood [][2]int,
 	row, col int,
-) (bool, [][2]int) {
+) [][2]int {
 	solved, _ := ps.Solved(row, col)
 	if solved {
 		return applyNoRepeat(ps, neighbourhood, row, col)
@@ -69,7 +69,7 @@ func applyOneToNine(
 		}
 	}
 	if neighbourIndex == -1 {
-		return false, nil
+		return nil
 	}
 	possibleIndexes := make([][]int, 9)
 	for i := 0; i < 9; i++ {
@@ -92,7 +92,7 @@ func applyOneToNine(
 		}
 		return applyNoRepeat(ps, neighbourhood, row, col)
 	}
-	return false, nil
+	return nil
 }
 
 type HorizontalRule struct{}
@@ -109,7 +109,7 @@ func (rule HorizontalRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
 
-func (rule HorizontalRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
+func (rule HorizontalRule) Apply(ps *PossibleSudoku, row, col int) [][2]int {
 	return applyOneToNine(ps, rule.neighbourhood(row, col), row, col)
 }
 
@@ -127,7 +127,7 @@ func (rule VerticalRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
 
-func (rule VerticalRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
+func (rule VerticalRule) Apply(ps *PossibleSudoku, row, col int) [][2]int {
 	return applyOneToNine(ps, rule.neighbourhood(row, col), row, col)
 }
 
@@ -148,6 +148,6 @@ func (rule SquareRule) Check(ps *PossibleSudoku, row, col int) bool {
 	return checkNoRepeat(ps, rule.neighbourhood(row, col))
 }
 
-func (rule SquareRule) Apply(ps *PossibleSudoku, row, col int) (bool, [][2]int) {
+func (rule SquareRule) Apply(ps *PossibleSudoku, row, col int) [][2]int {
 	return applyOneToNine(ps, rule.neighbourhood(row, col), row, col)
 }

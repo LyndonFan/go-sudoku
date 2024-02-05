@@ -48,14 +48,11 @@ func (solver *Solver) Solve(puzzle Sudoku) []*Sudoku {
 				if !satisfyRule {
 					return []*Sudoku{}
 				}
-				applied, changedPositions := rule.Apply(ps, row, col)
-				if !applied {
-					continue
-				}
-				changed = true
+				changedPositions := rule.Apply(ps, row, col)
 				for _, cPos := range changedPositions {
 					newCheckPosition[cPos[0]*9+cPos[1]] = true
 				}
+				changed = changed || (len(changedPositions) > 0)
 			}
 		}
 		checkPosition = newCheckPosition
